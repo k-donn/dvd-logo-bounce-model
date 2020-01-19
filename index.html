@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<link rel="stylesheet" href="/css/index.css" />
+		<title>DVD bouncing logo</title>
+	</head>
+	<body>
+		<canvas id="mock-screen"></canvas>
+		<script src="/js/block.js"></script>
+		<script>
+			let canvas = document.getElementById("mock-screen");
+			let blk = new Block(canvas, 5, 5, 1, 1);
+			blk.draw();
+		</script>
+	</body>
+</html>
