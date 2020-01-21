@@ -1,6 +1,6 @@
 /**
  * TODO
- * - Make the super-square
+ * - Add major gridlines
  */
 
 class Block {
@@ -28,10 +28,6 @@ class Block {
 		this.blockHeight = 35;
 
 		// In pixels
-		this.canvasWidth = screenBlocksWide * this.blockWidth;
-		this.canvasHeight = screenBlocksTall * this.blockWidth;
-
-		// In pixels
 		this.logoWidth = this.logoBlocksWide * this.blockWidth;
 		this.logoHeight = this.logoBlocksTall * this.blockHeight;
 
@@ -40,10 +36,10 @@ class Block {
 		this.yVelocity = this.blockHeight;
 
 		// In pixels
-		this.canvas.width = this.canvasWidth;
-		this.canvas.height = this.canvasHeight;
+		this.redXVelocity = this.blockWidth;
+		this.redYVelocity = this.blockHeight;
 
-		// In blocks, not pixels
+		// In blocks, not pixels. For the small rect.
 		this.widthDiff = this.screenBlocksWide - this.logoBlocksWide;
 		this.heightDiff = this.screenBlocksTall - this.logoBlocksTall;
 
@@ -51,8 +47,22 @@ class Block {
 		this.diffGcd = this.gcd(this.widthDiff, this.heightDiff);
 		this.diffLcm = this.lcm(this.widthDiff, this.heightDiff);
 
+		this.rectWidth = screenBlocksWide * this.blockWidth;
+		this.rectHeight = screenBlocksTall * this.blockHeight;
+
+		// In pixels
+		this.canvasWidth = this.diffLcm * this.blockWidth;
+		this.canvasHeight = this.diffLcm * this.blockWidth;
+
+		// In pixels
+		this.canvas.width = this.canvasWidth;
+		this.canvas.height = this.canvasHeight;
+
 		this.x = 0;
 		this.y = 0;
+
+		this.redX = 0;
+		this.redY = 0;
 
 		this.corner1 = null;
 		this.corner2 = null;
@@ -137,7 +147,7 @@ class Block {
 		}
 	}
 
-	drawRect() {
+	draw() {
 		this.canvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
 		// Background
@@ -146,11 +156,20 @@ class Block {
 
 		this.drawGrid();
 
-		// The block
+		// The rect block
 		this.canvasCtx.fillStyle = "#32CD32";
 		this.canvasCtx.fillRect(
 			this.x + 1,
 			this.y + 1,
+			this.logoWidth - 2,
+			this.logoHeight - 2
+		);
+
+		// The super square block
+		this.canvasCtx.fillStyle = "#FF0000";
+		this.canvasCtx.fillRect(
+			this.redX + 1,
+			this.redY + 1,
 			this.logoWidth - 2,
 			this.logoHeight - 2
 		);
@@ -173,12 +192,22 @@ class Block {
 			this.x += this.xVelocity;
 			this.y += this.yVelocity;
 
+			this.redX += this.redXVelocity;
+			this.redY += this.redYVelocity;
+
 			// The logo is drawn from its top-left corner
-			let right = this.x + this.logoWidth === this.canvasWidth;
 			let left = this.x === 0;
+			let right = this.x + this.logoWidth === this.rectWidth;
 
 			let top = this.y === 0;
-			let bottom = this.y + this.logoHeight === this.canvasHeight;
+			let bottom = this.y + this.logoHeight === this.rectHeight;
+
+			let squareLeft = this.redX === 0;
+			let squareRight = this.redX + this.logoWidth === this.canvasWidth;
+
+			let squareTop = this.redY === 0;
+			let squareBottom =
+				this.redY + this.logoHeight === this.canvasHeight;
 
 			if (bottom && right) {
 				console.log("bottom right");
@@ -193,7 +222,6 @@ class Block {
 				console.log("top left");
 			}
 
-			// Right
 			if (right) {
 				this.xVelocity = -this.xVelocity;
 			}
@@ -206,9 +234,22 @@ class Block {
 			if (left) {
 				this.xVelocity = -this.xVelocity;
 			}
+
+			if (squareRight) {
+				this.redXVelocity = -this.redXVelocity;
+			}
+			if (squareTop) {
+				this.redYVelocity = -this.redYVelocity;
+			}
+			if (squareBottom) {
+				this.redYVelocity = -this.redYVelocity;
+			}
+			if (squareLeft) {
+				this.redXVelocity = -this.redXVelocity;
+			}
 		}
 
-		this.drawRect();
+		this.draw();
 	}
 
 	animate() {
