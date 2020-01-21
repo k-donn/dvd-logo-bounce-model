@@ -1,3 +1,8 @@
+/**
+ * TODO
+ * - Make the super-square
+ */
+
 class Block {
 	constructor(
 		canvas,
@@ -19,30 +24,120 @@ class Block {
 
 		this.rate = rate;
 
-		this.blockWidth = 100;
-		this.blockHeight = 100;
+		this.blockWidth = 35;
+		this.blockHeight = 35;
 
+		// In pixels
 		this.canvasWidth = screenBlocksWide * this.blockWidth;
 		this.canvasHeight = screenBlocksTall * this.blockWidth;
 
+		// In pixels
 		this.logoWidth = this.logoBlocksWide * this.blockWidth;
 		this.logoHeight = this.logoBlocksTall * this.blockHeight;
 
+		// In pixels
 		this.xVelocity = this.blockWidth;
 		this.yVelocity = this.blockHeight;
 
+		// In pixels
 		this.canvas.width = this.canvasWidth;
 		this.canvas.height = this.canvasHeight;
+
+		// In blocks, not pixels
+		this.widthDiff = this.screenBlocksWide - this.logoBlocksWide;
+		this.heightDiff = this.screenBlocksTall - this.logoBlocksTall;
+
+		// In blocks, not pixels
+		this.diffGcd = this.gcd(this.widthDiff, this.heightDiff);
+		this.diffLcm = this.lcm(this.widthDiff, this.heightDiff);
 
 		this.x = 0;
 		this.y = 0;
 
+		this.corner1 = null;
+		this.corner2 = null;
+
 		this.animId = null;
+
+		console.group("Differences");
+		console.log("Width Diff " + this.widthDiff);
+		console.log("Height Diff " + this.heightDiff);
+		console.groupEnd("Differences");
+
+		console.group("GCD and LCM");
+		console.log("gcd of WdthDiff and HgtDiff " + this.diffGcd);
+		console.log("lcm of WdthDiff and HgtDiff " + this.diffLcm);
+		console.groupEnd("GCD and LCM");
+
+		this.findCorners();
 	}
 
-	findCorners() {}
+	/**
+	 * Return the largest number that divides to the two numbers (the greatest common denominator).
+	 *
+	 * @param {number} a First term
+	 * @param {number} b Second term
+	 * @returns {number} The greatest common denominator
+	 */
+	gcd(a, b) {
+		if (!b) {
+			return a;
+		}
 
-	draw() {
+		return this.gcd(b, a % b);
+	}
+
+	/**
+	 * Return the smallest number that is divisable by both terms (the lowest common multiple).
+	 *
+	 * @param {number} a First term
+	 * @param {number} b Second term
+	 * @returns {number} The lowest common multiple
+	 */
+	lcm(a, b) {
+		return Math.abs(a * b) / this.gcd(a, b);
+	}
+
+	/**
+	 * Determine the first two corners the logo will hit if any.
+	 */
+	findCorners() {
+		let xyDiff = Math.abs(this.x - this.y);
+		if (xyDiff % this.diffGcd === 0) {
+			// corners will be reached
+			if ((xyDiff / this.diffGcd) % 2 === 0) {
+				this.corner1 =
+					((this.diffLcm / this.heightDiff) % 2 === 0 ? "T" : "B") +
+					((this.diffLcm / this.widthDiff) % 2 === 0 ? "L" : "R");
+				this.corner2 = "TL";
+
+				console.group("corner-1");
+				console.log(this.corner1);
+				console.groupEnd("corner-1");
+
+				console.group("corner 2");
+				console.log(this.corner2);
+				console.groupEnd("corner-2");
+			} else {
+				this.corner1 =
+					((this.diffLcm / this.heightDiff) % 2 !== 0 ? "T" : "B") +
+					((this.diffLcm / this.widthDiff) % 2 !== 0 ? "L" : "R");
+				this.corner2 = "BR";
+
+				console.group("corner-1");
+				console.log(this.corner1);
+				console.groupEnd("corner-1");
+
+				console.group("corner 2");
+				console.log(this.corner2);
+				console.groupEnd("corner-2");
+			}
+		} else {
+			console.log("No corner!");
+		}
+	}
+
+	drawRect() {
 		this.canvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
 		// Background
@@ -113,7 +208,7 @@ class Block {
 			}
 		}
 
-		this.draw();
+		this.drawRect();
 	}
 
 	animate() {
