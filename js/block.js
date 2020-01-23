@@ -24,8 +24,8 @@ class Block {
 
 		this.rate = rate;
 
-		this.blockWidth = 35;
-		this.blockHeight = 35;
+		this.blockWidth = 25;
+		this.blockHeight = 25;
 
 		// In pixels
 		this.logoWidth = this.logoBlocksWide * this.blockWidth;
@@ -51,8 +51,8 @@ class Block {
 		this.rectHeight = screenBlocksTall * this.blockHeight;
 
 		// In pixels
-		this.canvasWidth = this.diffLcm * this.blockWidth;
-		this.canvasHeight = this.diffLcm * this.blockWidth;
+		this.canvasWidth = (this.diffLcm + 1) * this.blockWidth;
+		this.canvasHeight = (this.diffLcm + 1) * this.blockWidth;
 
 		// In pixels
 		this.canvas.width = this.canvasWidth;
@@ -63,6 +63,9 @@ class Block {
 
 		this.redX = 0;
 		this.redY = 0;
+
+		this.distance = 0;
+		this.squareDistance = 0;
 
 		this.corner1 = null;
 		this.corner2 = null;
@@ -154,8 +157,6 @@ class Block {
 		this.canvasCtx.fillStyle = "#D3D3D3";
 		this.canvasCtx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-		// this.drawGrid();
-
 		// The rect block
 		this.canvasCtx.fillStyle = "#32CD32";
 		this.canvasCtx.fillRect(
@@ -173,63 +174,40 @@ class Block {
 			this.logoWidth - 2,
 			this.logoHeight - 2
 		);
+		this.drawGrid(this.canvasWidth, this.canvasHeight, this.blockWidth);
 	}
 
-	drawGrid() {
-		let data = `<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-			<defs>
-				<pattern
-					id="smallGrid"
-					width="8"
-					height="8"
-					patternUnits="userSpaceOnUse"
-				>
-					<path
-						d="M 8 0 L 0 0 0 8"
-						fill="none"
-						stroke="gray"
-						stroke-width="0.5"
-					/>
-				</pattern>
-				<pattern
-					id="grid"
-					width="80"
-					height="80"
-					patternUnits="userSpaceOnUse"
-				>
-					<rect width="80" height="80" fill="url(#smallGrid)" />
-					<path
-						d="M 80 0 L 0 0 0 80"
-						fill="none"
-						stroke="gray"
-						stroke-width="1"
-					/>
-				</pattern>
-			</defs>
+	drawGrid(w, h, minorStep) {
+		this.canvasCtx.beginPath();
+		for (let x = 0; x <= w; x += minorStep) {
+			this.canvasCtx.moveTo(x, 0);
+			this.canvasCtx.lineTo(x, h);
+		}
+		this.canvasCtx.strokeStyle = "#000000";
+		this.canvasCtx.lineWidth = 1;
+		this.canvasCtx.stroke();
 
-			<rect width="100%" height="100%" fill="url(#smallGrid)" />
-		</svg>`;
-
-		let DOMURL = window.URL || window.webkitURL || window;
-
-		let img = new Image();
-		let svg = new Blob([data], { type: "image/svg+xml;charset=utf-8" });
-		let url = DOMURL.createObjectURL(svg);
-
-		img.onload = () => {
-			this.canvasCtx.drawImage(img, 0, 0);
-			DOMURL.revokeObjectURL(url);
-		};
-		img.src = url;
+		this.canvasCtx.beginPath();
+		for (let y = 0; y <= h; y += minorStep) {
+			this.canvasCtx.moveTo(0, y);
+			this.canvasCtx.lineTo(w, y);
+		}
+		this.canvasCtx.strokeStyle = "#000000";
+		this.canvasCtx.lineWidth = 1;
+		this.canvasCtx.stroke();
 	}
 
 	update() {
+		// debugger;
 		for (let i = 0; i < this.rate; i++) {
 			this.x += this.xVelocity;
 			this.y += this.yVelocity;
 
 			this.redX += this.redXVelocity;
 			this.redY += this.redYVelocity;
+
+			this.squareDistance += 1;
+			this.distance += 1;
 
 			// The logo is drawn from its top-left corner
 			let left = this.x === 0;
@@ -246,15 +224,19 @@ class Block {
 				this.redY + this.logoHeight === this.canvasHeight;
 
 			if (bottom && right) {
+				this.distance = 0;
 				console.log("bottom right");
 			}
 			if (bottom && left) {
+				this.distance = 0;
 				console.log("bottom left");
 			}
 			if (top && right) {
+				this.distance = 0;
 				console.log("top right");
 			}
 			if (top && left) {
+				this.distance = 0;
 				console.log("top left");
 			}
 
@@ -269,6 +251,23 @@ class Block {
 			}
 			if (left) {
 				this.xVelocity = -this.xVelocity;
+			}
+
+			if (squareBottom && squareRight) {
+				this.squareDistance = 0;
+				console.log("squareBottom squareRight");
+			}
+			if (squareBottom && squareLeft) {
+				this.squareDistance = 0;
+				console.log("squareBottom squareLeft");
+			}
+			if (squareTop && squareRight) {
+				this.squareDistance = 0;
+				console.log("squareTop squareRight");
+			}
+			if (squareTop && squareLeft) {
+				this.squareDistance = 0;
+				console.log("squareTop squareLeft");
 			}
 
 			if (squareRight) {
@@ -286,9 +285,11 @@ class Block {
 		}
 
 		this.draw();
+	}
 
-		requestAnimationFrame(() => {
+	animate() {
+		this.animate = setInterval(() => {
 			this.update();
-		});
+		}, 1000 / 3);
 	}
 }
