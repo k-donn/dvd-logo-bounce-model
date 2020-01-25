@@ -3,7 +3,20 @@
  * - Add major gridlines
  */
 
+/**
+ * Represent a block bouncing inside of a grid
+ */
 class Block {
+	/**
+	 * Create a block object.
+	 *
+	 * @param {HTMLCanvasElement} canvas The empty canvas element
+	 * @param {number} screenBlocksWide The number of blocks wide to make the screen
+	 * @param {number} screenBlocksTall The number of blocks tall to make the screen
+	 * @param {number} logoBlocksWide Number of blocks teh logo is (not pixels)
+	 * @param {number} logoBlocksTall Number of blocks the logo is tall (not pixels)
+	 * @param {number} rate Number of times to move the block each update call
+	 */
 	constructor(
 		canvas,
 		screenBlocksWide,
@@ -70,6 +83,7 @@ class Block {
 		this.corner1 = null;
 		this.corner2 = null;
 
+		/** @type {number} */
 		this.animId = null;
 
 		console.group("Differences");
@@ -118,38 +132,33 @@ class Block {
 		let xyDiff = Math.abs(this.x - this.y);
 		if (xyDiff % this.diffGcd === 0) {
 			// corners will be reached
+			console.group("Corners");
 			if ((xyDiff / this.diffGcd) % 2 === 0) {
 				this.corner1 =
 					((this.diffLcm / this.heightDiff) % 2 === 0 ? "T" : "B") +
 					((this.diffLcm / this.widthDiff) % 2 === 0 ? "L" : "R");
 				this.corner2 = "TL";
 
-				console.group("corner-1");
 				console.log(this.corner1);
-				console.groupEnd("corner-1");
-
-				console.group("corner 2");
 				console.log(this.corner2);
-				console.groupEnd("corner-2");
 			} else {
 				this.corner1 =
 					((this.diffLcm / this.heightDiff) % 2 !== 0 ? "T" : "B") +
 					((this.diffLcm / this.widthDiff) % 2 !== 0 ? "L" : "R");
 				this.corner2 = "BR";
 
-				console.group("corner-1");
 				console.log(this.corner1);
-				console.groupEnd("corner-1");
-
-				console.group("corner 2");
 				console.log(this.corner2);
-				console.groupEnd("corner-2");
 			}
 		} else {
 			console.log("No corner!");
 		}
+		console.groupEnd("Corners");
 	}
 
+	/**
+	 * Draw all of the elements on the canvas
+	 */
 	draw() {
 		this.canvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
@@ -197,6 +206,9 @@ class Block {
 		this.canvasCtx.stroke();
 	}
 
+	/**
+	 * Recalculate the position of everything on the canvas
+	 */
 	update() {
 		// debugger;
 		for (let i = 0; i < this.rate; i++) {
@@ -287,8 +299,11 @@ class Block {
 		this.draw();
 	}
 
+	/**
+	 * Repeatedly call the update function
+	 */
 	animate() {
-		this.animate = setInterval(() => {
+		this.animId = setInterval(() => {
 			this.update();
 		}, 1000 / 3);
 	}
