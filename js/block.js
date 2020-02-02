@@ -1,6 +1,6 @@
 /**
  * TODO
- * - Add major gridlines
+ * - Add timing
  */
 
 /**
@@ -13,7 +13,7 @@ class Block {
 	 * @param {HTMLCanvasElement} canvas The empty canvas element
 	 * @param {number} screenBlocksWide The number of blocks wide to make the screen
 	 * @param {number} screenBlocksTall The number of blocks tall to make the screen
-	 * @param {number} logoBlocksWide Number of blocks teh logo is (not pixels)
+	 * @param {number} logoBlocksWide Number of blocks the logo is (not pixels)
 	 * @param {number} logoBlocksTall Number of blocks the logo is tall (not pixels)
 	 * @param {number} rate Number of times to move the block each update call
 	 */
@@ -37,8 +37,8 @@ class Block {
 
 		this.rate = rate;
 
-		this.blockWidth = 25;
-		this.blockHeight = 25;
+		this.blockWidth = 30;
+		this.blockHeight = 30;
 
 		// In pixels
 		this.logoWidth = this.logoBlocksWide * this.blockWidth;
@@ -166,6 +166,9 @@ class Block {
 		this.canvasCtx.fillStyle = "#D3D3D3";
 		this.canvasCtx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
+		this.canvasCtx.fillStyle = "#87CEEB";
+		this.canvasCtx.fillRect(0, 0, this.rectWidth, this.rectHeight);
+
 		// The rect block
 		this.canvasCtx.fillStyle = "#32CD32";
 		this.canvasCtx.fillRect(
@@ -183,10 +186,18 @@ class Block {
 			this.logoWidth - 2,
 			this.logoHeight - 2
 		);
-		this.drawGrid(this.canvasWidth, this.canvasHeight, this.blockWidth);
+		this.drawGrid(
+			this.canvasWidth,
+			this.canvasHeight,
+			this.blockWidth,
+			this.rectWidth - this.blockWidth,
+			this.rectHeight - this.blockHeight
+		);
 	}
 
-	drawGrid(w, h, minorStep) {
+	drawGrid(w, h, minorStep, majorXStep, majorYStep) {
+		// Vertical lines
+		this.canvasCtx.setLineDash([]);
 		this.canvasCtx.beginPath();
 		for (let x = 0; x <= w; x += minorStep) {
 			this.canvasCtx.moveTo(x, 0);
@@ -196,6 +207,8 @@ class Block {
 		this.canvasCtx.lineWidth = 1;
 		this.canvasCtx.stroke();
 
+		// Horizontal lines
+		this.canvasCtx.setLineDash([]);
 		this.canvasCtx.beginPath();
 		for (let y = 0; y <= h; y += minorStep) {
 			this.canvasCtx.moveTo(0, y);
@@ -203,6 +216,24 @@ class Block {
 		}
 		this.canvasCtx.strokeStyle = "#000000";
 		this.canvasCtx.lineWidth = 1;
+		this.canvasCtx.stroke();
+
+		// Vertical major lines
+		this.canvasCtx.setLineDash([3, 1]);
+		this.canvasCtx.beginPath();
+		for (let x = this.blockWidth / 2; x <= w; x += majorXStep) {
+			this.canvasCtx.moveTo(x, 0);
+			this.canvasCtx.lineTo(x, h);
+		}
+		this.canvasCtx.stroke();
+
+		// Horizontal major lines
+		this.canvasCtx.setLineDash([3, 1]);
+		this.canvasCtx.beginPath();
+		for (let y = this.blockHeight / 2; y <= w; y += majorYStep) {
+			this.canvasCtx.moveTo(0, y);
+			this.canvasCtx.lineTo(w, y);
+		}
 		this.canvasCtx.stroke();
 	}
 
