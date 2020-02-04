@@ -45,11 +45,15 @@ class Block {
 		this.logoHeight = this.logoBlocksTall * this.blockHeight;
 
 		// In pixels
+		/** @type {number} */
 		this.xVelocity = this.blockWidth;
+		/** @type {number} */
 		this.yVelocity = this.blockHeight;
-
+		
 		// In pixels
+		/** @type {number} */
 		this.redXVelocity = this.blockWidth;
+		/** @type {number} */
 		this.redYVelocity = this.blockHeight;
 
 		// In blocks, not pixels. For the small rect.
@@ -219,7 +223,8 @@ class Block {
 		this.canvasCtx.stroke();
 
 		// Vertical major lines
-		this.canvasCtx.setLineDash([3, 1]);
+		this.canvasCtx.lineWidth = "2";
+		this.canvasCtx.setLineDash([6, 2]);
 		this.canvasCtx.beginPath();
 		for (let x = this.blockWidth / 2; x <= w; x += majorXStep) {
 			this.canvasCtx.moveTo(x, 0);
@@ -228,7 +233,8 @@ class Block {
 		this.canvasCtx.stroke();
 
 		// Horizontal major lines
-		this.canvasCtx.setLineDash([3, 1]);
+		this.canvasCtx.lineWidth = "2";
+		this.canvasCtx.setLineDash([6, 2]);
 		this.canvasCtx.beginPath();
 		for (let y = this.blockHeight / 2; y <= w; y += majorYStep) {
 			this.canvasCtx.moveTo(0, y);
