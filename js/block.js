@@ -44,16 +44,14 @@ class Block {
 		this.logoWidth = this.logoBlocksWide * this.blockWidth;
 		this.logoHeight = this.logoBlocksTall * this.blockHeight;
 
-		// In pixels
-		/** @type {number} */
+		/** @type {number} In pixels */
 		this.xVelocity = this.blockWidth;
-		/** @type {number} */
+		/** @type {number} In pixels */
 		this.yVelocity = this.blockHeight;
 		
-		// In pixels
-		/** @type {number} */
+		/** @type {number} In pixels */
 		this.redXVelocity = this.blockWidth;
-		/** @type {number} */
+		/** @type {number} In pixels */
 		this.redYVelocity = this.blockHeight;
 
 		// In blocks, not pixels. For the small rect.
