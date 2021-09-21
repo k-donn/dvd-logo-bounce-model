@@ -48,7 +48,7 @@ class Block {
 		this.xVelocity = this.blockWidth;
 		/** @type {number} In pixels */
 		this.yVelocity = this.blockHeight;
-		
+
 		/** @type {number} In pixels */
 		this.redXVelocity = this.blockWidth;
 		/** @type {number} In pixels */
@@ -65,9 +65,12 @@ class Block {
 		this.rectWidth = screenBlocksWide * this.blockWidth;
 		this.rectHeight = screenBlocksTall * this.blockHeight;
 
+		this.enclosingBlocksWide = this.diffLcm + this.logoBlocksWide;
+		this.enclosingBlocksTall = this.diffLcm + this.logoBlocksTall;
+
 		// In pixels
-		this.canvasWidth = (this.diffLcm + 1) * this.blockWidth;
-		this.canvasHeight = (this.diffLcm + 1) * this.blockWidth;
+		this.canvasWidth = this.enclosingBlocksWide * this.blockWidth;
+		this.canvasHeight = this.enclosingBlocksTall * this.blockHeight;
 
 		// In pixels
 		this.canvas.width = this.canvasWidth;
@@ -87,6 +90,8 @@ class Block {
 
 		/** @type {number} */
 		this.animId = null;
+
+		this.frame = 0;
 
 		console.group("Differences");
 		console.log("Width Diff " + this.widthDiff);
@@ -247,6 +252,12 @@ class Block {
 	update() {
 		// debugger;
 		for (let i = 0; i < this.rate; i++) {
+			this.frame += 1;
+			if (this.frame % this.diffLcm === 0) {
+				console.log(
+					"d = " + this.diffLcm + " * " + this.frame / this.diffLcm
+				);
+			}
 			this.x += this.xVelocity;
 			this.y += this.yVelocity;
 
